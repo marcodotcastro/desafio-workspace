@@ -1,0 +1,36 @@
+FROM ruby:3.2.2-slim
+
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends \
+      build-essential \
+      libpq-dev \
+      nodejs \
+      postgresql-client \
+      git \
+      curl \
+      imagemagick \
+      libmagickwand-dev \
+      libssl-dev \
+      libreadline-dev \
+      zlib1g-dev \
+      tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN gem install bundler -v 2.4.21
+
+# Cópia isolada do código fonte para a imagem da abstração
+COPY repos/compras /app
+COPY docker/compras-database.yml /app/config/database.yml
+COPY docker/legacy_migration_compatibility.rb /app/config/initializers/legacy_migration_compatibility.rb
+
+# Instalação das dependências
+RUN bundle install --jobs 4 --retry 3
+
+COPY docker/entrypoint-compras.sh /usr/local/bin/entrypoint-compras.sh
+RUN chmod +x /usr/local/bin/entrypoint-compras.sh
+
+EXPOSE 3001
+
+ENTRYPOINT ["/usr/local/bin/entrypoint-compras.sh"]

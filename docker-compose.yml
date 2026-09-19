@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # PostgreSQL para o Compras (Rails)
+  postgres:
+    image: postgres:15-alpine
+    container_name: volt-desafio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: compras_devme_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d compras_devme_development"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+    networks:
+      - volt-net
+
+  # 1. Compras (Rails 6.1 / Ruby 3.2 / Puma / PostgreSQL)
+  compras:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.compras
+    container_name: volt-desafio-compras
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      RAILS_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: compras_devme_development
+      SECRET_KEY_BASE: 5b4c106ad019fa300cf9dcae4f35e4d1b827e69ef05389efebf443b74a441e8c9f56360c7b3992b1ea73e20ecce800a7388aa1fa1bbf6bc7cae3df9caefaa92a
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - volt-net
+
+  # 2. AnythingLLM (Node 18 / Express + React / AI Platform)
+  anything-llm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: volt-desafio-anything-llm
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    environment:
+      STORAGE_DIR: "/app/server/storage"
+      SERVER_PORT: "3001"
+      DISABLE_TELEMETRY: "true"
+    volumes:
+      - anythingllm_storage:/app/server/storage
+    networks:
+      - volt-net
+
+  # 3. CodeLaravel (Laravel 11 / PHP 8.2 / SQLite)
+  codelaravel:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.codelaravel
+    container_name: volt-desafio-codelaravel
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      APP_NAME: "CodeLaravel"
+      APP_ENV: "local"
+      APP_DEBUG: "true"
+      APP_KEY: "base64:uN4hGqH4fQ+7LgR9/1OaZk3qP2Yw6J8B+3V1C7E9D0A="
+      DB_CONNECTION: "sqlite"
+      DB_DATABASE: "/data/database.sqlite"
+      SESSION_DRIVER: "file"
+      CACHE_STORE: "file"
+      QUEUE_CONNECTION: "sync"
+    volumes:
+      - codelaravel_data:/data
+    networks:
+      - volt-net
+
+  # 4. Hub / Painel de Controle Volt Soberano
+  hub:
+    build:
+      context: .
+      dockerfile: docker/hub/Dockerfile
+    container_name: volt-desafio-hub
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - compras
+      - anything-llm
+      - codelaravel
+    networks:
+      - volt-net
+
+networks:
+  volt-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  anythingllm_storage:
+  codelaravel_data:

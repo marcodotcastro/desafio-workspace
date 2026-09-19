@@ -1,0 +1,51 @@
+---
+schema: volt/workspace-manifest/v1
+name: desafio
+slug: desafio
+status: configured
+components:
+- id: anything-llm
+  role: anything-llm
+  source: path
+  path: "/home/marcodotcastro/Projects/volt-organization/anything-llm"
+  ref: main
+- id: codelaravel
+  role: codelaravel
+  source: path
+  path: "/home/marcodotcastro/Projects/volt-organization/CodeLaravel"
+  ref: main
+- id: compras
+  role: compras
+  source: path
+  path: "/home/marcodotcastro/Projects/volt-organization/compras"
+  ref: main
+relations: []
+runtime:
+  adapter: docker_compose
+  status: configured
+  compose_file: docker-compose.yml
+  services:
+    anything-llm:
+      service_name: anything-llm
+      port: 3000
+      url: http://127.0.0.1:3000
+      health_check: node -e "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+    codelaravel:
+      service_name: codelaravel
+      port: 5173
+      url: http://127.0.0.1:5173
+      health_check: node -e "fetch('http://127.0.0.1:5173').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+    compras:
+      service_name: compras
+      port: 3001
+      url: http://127.0.0.1:3001
+      health_check: 'ruby -rnet/http -e ''exit(Net::HTTP.get_response(URI("http://127.0.0.1:3000")).is_a?(Net::HTTPSuccess)
+        ? 0 : 1)'''
+    postgres:
+      service_name: postgres
+      health_check: pg_isready -U postgres -d volt
+    redis:
+      service_name: redis
+      health_check: redis-cli ping
+spec:
+  index_path: ".workspace/projects/desafio/specs/index.yaml"
