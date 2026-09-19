@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desafio Workspace Multi-Projetos — Demanda 1010 | Painel de Controle Volt</title>
+  <style>
+    :root {
+      --bg-base: #080c12;
+      --bg-surface: #0f1622;
+      --bg-card: rgba(15, 22, 34, 0.78);
+      --bg-card-hover: rgba(21, 31, 46, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-medium: rgba(255, 255, 255, 0.16);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-cyan: #38bdf8;
+      --accent-cyan-glow: rgba(56, 189, 248, 0.25);
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+      --accent-amber: #f59e0b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Karla", sans-serif; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #151f2e 0%, var(--bg-base) 75%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 3rem 1.5rem;
+    }
+    header {
+      max-width: 960px;
+      margin: 0 auto 2.5rem auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .badge-workspace {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(56, 189, 248, 0.08);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      margin-bottom: 1.1rem;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+    .volt-svg {
+      width: 40px;
+      height: 40px;
+      filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.4));
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #fff 40%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.03em;
+    }
+    .issue-highlight {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.45rem 1.15rem;
+      border-radius: 10px;
+      background: rgba(21, 31, 46, 0.85);
+      border: 1px solid var(--border-medium);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      margin-bottom: 1.1rem;
+    }
+    .issue-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-emerald);
+    }
+    .issue-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-family: var(--mono);
+    }
+    .issue-code {
+      font-size: 1.2rem;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--accent-cyan);
+      letter-spacing: 0.04em;
+    }
+    p.lead {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1.5rem;
+      max-width: 1040px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-medium);
+      box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
+    }
+    .card:hover::before {
+      opacity: 1;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .service-tag {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--accent-emerald);
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-emerald);
+      animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.15); }
+    }
+    .card h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+    .meta {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-subtle);
+      line-height: 1.6;
+    }
+    .meta strong {
+      color: var(--text-secondary);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.8rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+      box-shadow: 0 0 18px var(--accent-cyan-glow);
+    }
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding-top: 3.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    footer strong {
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Badge Workspace Soberano no topo -->
+    <div class="badge-workspace">
+      <div class="badge-dot"></div>
+      <span>Workspace Soberano</span>
+    </div>
+
+    <!-- Marca Oficial do Volt -->
+    <div class="brand-logo">
+      <svg class="volt-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+        <defs>
+          <linearGradient id="facet-top" x1="16" y1="8" x2="112" y2="64" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#2d3f56"/>
+            <stop offset="100%" stop-color="#1b2839"/>
+          </linearGradient>
+          <linearGradient id="facet-left" x1="16" y1="36" x2="64" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#182333"/>
+            <stop offset="100%" stop-color="#0c121b"/>
+          </linearGradient>
+          <linearGradient id="facet-right" x1="112" y1="36" x2="64" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#131c29"/>
+            <stop offset="100%" stop-color="#070a0f"/>
+          </linearGradient>
+          <linearGradient id="volt-cyan" x1="32" y1="36" x2="64" y2="114" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#a5f3fc"/>
+            <stop offset="35%" stop-color="#38bdf8"/>
+            <stop offset="80%" stop-color="#0284c7"/>
+            <stop offset="100%" stop-color="#0369a1"/>
+          </linearGradient>
+          <linearGradient id="volt-spark-gold" x1="40" y1="38" x2="64" y2="112" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#fffbeb"/>
+            <stop offset="30%" stop-color="#fef08a"/>
+            <stop offset="70%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#fbbf24"/>
+          </linearGradient>
+          <filter id="volt-glow" x="-25%" y="-25%" width="150%" height="150%">
+            <feGaussianBlur stdDeviation="3.5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <g id="isometric-cube">
+          <polygon points="64,12 110,38 64,64 18,38" fill="url(#facet-top)" stroke="rgba(255, 255, 255, 0.16)" stroke-width="1.2" stroke-linejoin="round"/>
+          <polygon points="18,38 64,64 64,116 18,90" fill="url(#facet-left)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.2" stroke-linejoin="round"/>
+          <polygon points="64,64 110,38 110,90 64,116" fill="url(#facet-right)" stroke="rgba(255, 255, 255, 0.05)" stroke-width="1.2" stroke-linejoin="round"/>
+        </g>
+        <g id="electric-v" filter="url(#volt-glow)">
+          <path d="M 32,38 L 46,38 L 64,86 L 82,38 L 96,38 L 69,98 L 64,112 L 59,98 Z" fill="url(#volt-cyan)"/>
+          <path d="M 39,40 L 64,92 L 89,40" stroke="url(#volt-spark-gold)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+          <line x1="64" y1="92" x2="64" y2="114" stroke="#fffbeb" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <span class="brand-title">Painel de Controle Volt</span>
+    </div>
+
+    <!-- Título do Projeto -->
+    <h1>Desafio Workspace Multi-Projetos</h1>
+
+    <!-- Demanda / Issue em Destaque Maior -->
+    <div class="issue-highlight">
+      <div class="issue-dot"></div>
+      <span class="issue-tag">Demanda</span>
+      <span class="issue-code">1010</span>
+    </div>
+
+    <!-- Descrição Fluida -->
+    <p class="lead">Orquestração soberana de 3 ecossistemas independentes (Rails 6.1, AnythingLLM e Laravel 11) sob a Camada de Abstração Volt com garantia estrita de integridade dos repositórios de origem.</p>
+  </header>
+
+  <main class="grid">
+    <!-- Card 1: Compras -->
+    <div class="card" id="card-compras">
+      <div>
+        <div class="card-header">
+          <span class="service-tag">Rails 6.1 • Ruby 3.2.2 • PostgreSQL</span>
+          <div class="status-pill" id="status-compras">
+            <div class="status-dot"></div>
+            <span>Ativo</span>
+          </div>
+        </div>
+        <h2>Compras e Licitações</h2>
+        <p>Sistema de compras públicas e contratos sobre Rails 6.1, Puma e PostgreSQL 15. Provisionado de forma limpa via abstração Volt sem alterar arquivos de origem.</p>
+      </div>
+      <div>
+        <div class="meta">
+          <div><strong>Porta:</strong> 3001</div>
+          <div><strong>Admin Volt:</strong> login: <code>admin</code> / senha: <code>senha123</code></div>
+          <div><strong>Admin Seed:</strong> login: <code>claudemir</code> / senha: <code>claudemir</code></div>
+        </div>
+        <a href="http://localhost:3001" target="_blank" class="btn">Abrir Compras (Porta 3001)</a>
+      </div>
+    </div>
+
+    <!-- Card 2: AnythingLLM -->
+    <div class="card" id="card-anythingllm">
+      <div>
+        <div class="card-header">
+          <span class="service-tag">Node 18 • Express + React • AI Platform</span>
+          <div class="status-pill" id="status-anythingllm">
+            <div class="status-dot"></div>
+            <span>Ativo</span>
+          </div>
+        </div>
+        <h2>AnythingLLM</h2>
+        <p>Plataforma de inteligência artificial soberana para documentos e chat multimodal com suporte a múltiplos provedores e base vetorial isolada em volume seguro.</p>
+      </div>
+      <div>
+        <div class="meta">
+          <div><strong>Porta:</strong> 3002</div>
+          <div><strong>Autenticação:</strong> Modo Soberano Single-User</div>
+          <div><strong>Acesso:</strong> Acesso direto sem senha necessária</div>
+        </div>
+        <a href="http://localhost:3002" target="_blank" class="btn">Abrir AnythingLLM (Porta 3002)</a>
+      </div>
+    </div>
+
+    <!-- Card 3: CodeLaravel -->
+    <div class="card" id="card-codelaravel">
+      <div>
+        <div class="card-header">
+          <span class="service-tag">Laravel 11 • PHP 8.2 • SQLite</span>
+          <div class="status-pill" id="status-codelaravel">
+            <div class="status-dot"></div>
+            <span>Ativo</span>
+          </div>
+        </div>
+        <h2>CodeLaravel</h2>
+        <p>Aplicação moderna Laravel 11 com arquitetura limpa, banco de dados SQLite persistente em volume isolado e usuários de teste semeados automaticamente.</p>
+      </div>
+      <div>
+        <div class="meta">
+          <div><strong>Porta:</strong> 3003</div>
+          <div><strong>Usuário Teste:</strong> <code>test@example.com</code></div>
+          <div><strong>Senha:</strong> <code>password</code></div>
+        </div>
+        <a href="http://localhost:3003" target="_blank" class="btn">Abrir CodeLaravel (Porta 3003)</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Operado com soberania pelo <strong>Volt</strong> • Demanda 1010 • 2026</p>
+  </footer>
+</body>
+</html>

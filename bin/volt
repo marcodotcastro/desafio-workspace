@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VOLT_BIN="${VOLT_BIN:-${Volt_BIN:-volt}}"
+if [[ "${1:-}" == "builder" ]]; then
+  exec "$VOLT_BIN" "$@"
+fi
+exec "$VOLT_BIN" builder "$@"

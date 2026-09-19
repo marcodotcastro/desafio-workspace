@@ -1,0 +1,10 @@
+# Product repositories are independent checkouts.
+/repos/*
+!/repos/.gitkeep
+
+# Runtime logs and generated test receipts are local state.
+/.workspace/logs/
+/.workspace/runtime/
+
+# Local agent symlinks
+/.agents/
